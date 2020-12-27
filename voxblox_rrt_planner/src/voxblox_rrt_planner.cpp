@@ -16,7 +16,7 @@ VoxbloxRrtPlanner::VoxbloxRrtPlanner(const ros::NodeHandle& nh,
       nh_private_(nh_private),
       frame_id_("odom"),
       visualize_(true),
-      do_smoothing_(true),
+      do_smoothing_(true), // FIXME: Enable smoothing algorithm
       last_trajectory_valid_(false),
       lower_bound_(Eigen::Vector3d::Zero()),
       upper_bound_(Eigen::Vector3d::Zero()),
@@ -225,22 +225,23 @@ bool VoxbloxRrtPlanner::plannerServiceCallback(
         !generateFeasibleTrajectory(waypoints, &poly_path);
     poly_timer.Stop();
 
-    mav_msgs::EigenTrajectoryPointVector loco_path;
-    mav_trajectory_generation::timing::Timer loco_timer("plan/loco");
-    bool loco_has_collisions =
-        !generateFeasibleTrajectoryLoco(waypoints, &loco_path);
-    loco_timer.Stop();
+    // FIXME: Enable other smoothing algorithm
+    // mav_msgs::EigenTrajectoryPointVector loco_path;
+    // mav_trajectory_generation::timing::Timer loco_timer("plan/loco");
+    // bool loco_has_collisions =
+    //     !generateFeasibleTrajectoryLoco(waypoints, &loco_path);
+    // loco_timer.Stop();
 
-    mav_msgs::EigenTrajectoryPointVector loco2_path;
-    mav_trajectory_generation::timing::Timer loco2_timer("plan/loco2");
-    bool loco2_has_collisions =
-        !generateFeasibleTrajectoryLoco2(waypoints, &loco2_path);
-    loco2_timer.Stop();
+    // mav_msgs::EigenTrajectoryPointVector loco2_path;
+    // mav_trajectory_generation::timing::Timer loco2_timer("plan/loco2");
+    // bool loco2_has_collisions =
+    //     !generateFeasibleTrajectoryLoco2(waypoints, &loco2_path);
+    // loco2_timer.Stop();
 
-    ROS_INFO(
-        "Poly Smoothed Path has collisions? %d Loco Path has collisions? %d "
-        "Loco 2 has collisions? %d",
-        poly_has_collisions, loco_has_collisions, loco2_has_collisions);
+    // ROS_INFO(
+    //     "Poly Smoothed Path has collisions? %d Loco Path has collisions? %d "
+    //     "Loco 2 has collisions? %d",
+    //     poly_has_collisions, loco_has_collisions, loco2_has_collisions);
 
     if (!poly_has_collisions) {
       last_trajectory_valid_ = true;
@@ -250,12 +251,13 @@ bool VoxbloxRrtPlanner::plannerServiceCallback(
       marker_array.markers.push_back(createMarkerForPath(
           poly_path, frame_id_, mav_visualization::Color::Orange(), "poly",
           0.075));
-      marker_array.markers.push_back(
-          createMarkerForPath(loco_path, frame_id_,
-                              mav_visualization::Color::Pink(), "loco", 0.075));
-      marker_array.markers.push_back(createMarkerForPath(
-          loco2_path, frame_id_, mav_visualization::Color::Teal(), "loco2",
-          0.075));
+
+      // marker_array.markers.push_back(
+      //     createMarkerForPath(loco_path, frame_id_,
+      //                         mav_visualization::Color::Pink(), "loco", 0.075));
+      // marker_array.markers.push_back(createMarkerForPath(
+      //     loco2_path, frame_id_, mav_visualization::Color::Teal(), "loco2",
+      //     0.075));
     }
   }
 
